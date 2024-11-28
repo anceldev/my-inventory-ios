@@ -56,6 +56,11 @@
             value = "6746606b001dbd95ee02"
             isEnabled = "YES">
          </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "AW_DATABASE_ID"
+            value = "6746677f00140e4c2443"
+            isEnabled = "YES">
+         </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
