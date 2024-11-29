@@ -34,6 +34,7 @@ struct CustomTextField: View {
                     .padding(.vertical, 10)
                     .font(.system(size: 14))
             }
+            .background(.white)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay {
                 RoundedRectangle(cornerRadius: 10)

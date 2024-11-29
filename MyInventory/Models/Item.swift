@@ -45,7 +45,6 @@ struct Item: Codable, Identifiable {
     
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.id, forKey: .id)
         try container.encode(self.name, forKey: .name)
         try container.encode(self.description, forKey: .description)
         try container.encode(self.status, forKey: .status)

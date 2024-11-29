@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct MyInventoryApp: App {
+    
+    @State var authVM = AuthViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AuthenticatedView()
+                .environment(authVM)
         }
     }
 }

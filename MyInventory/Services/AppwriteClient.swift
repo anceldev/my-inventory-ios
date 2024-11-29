@@ -21,7 +21,7 @@ enum AWConfig: String {
     var id: String {
         switch self {
         case .endpoint: "https://cloud.appwrite.io/v1"
-        case .project: Bundle.main.infoDictionary?["AW_PROJECT_ID"] as? String ?? ""
+        case .project:  Bundle.main.infoDictionary?["AW_PROJECT_ID"] as? String ?? ""
         case .database: Bundle.main.infoDictionary?["AW_DATABASE_ID"] as? String ?? ""
         }
     }
@@ -41,7 +41,6 @@ enum AWBucket {
     }
 }
 
-
 enum AWCollection {
     case users
     case inventories
@@ -50,10 +49,10 @@ enum AWCollection {
     
     var id: String {
         switch self {
-        case .items: Bundle.main.infoDictionary?["AW_PROJECT_ID"] as? String ?? ""
-        case .users: Bundle.main.infoDictionary?["AW_DATABASE_ID"] as? String ?? ""
-        case .inventories: Bundle.main.infoDictionary?["AW_INVENTORIES_COLLECTION_ID"] as? String ?? ""
-        case .boxes: Bundle.main.infoDictionary?["6747ac0000348079a0a9"] as? String ?? ""
+        case .items:        Bundle.main.infoDictionary?["AW_ITEMS_COLLECTION_ID"] as? String ?? ""
+        case .users:        Bundle.main.infoDictionary?["AW_USERS_COLLECTION_ID"] as? String ?? ""
+        case .inventories:  Bundle.main.infoDictionary?["AW_INVENTORIES_COLLECTION_ID"] as? String ?? ""
+        case .boxes:        Bundle.main.infoDictionary?["AW_BOXES_COLLECTION_ID"] as? String ?? ""
         }
     }
 }
@@ -73,6 +72,11 @@ struct AWClient {
         self.storage = Storage(self.client)
     }
     
+    /// Gets a document from appwrite and decodes it to the specified model
+    /// - Parameters:
+    ///   - collection: model's collection
+    ///   - id: document ID
+    /// - Returns: Model
     static func getModel<T:Codable>(collection: AWCollection, id: String) async throws -> T {
         do {
             let document = try await AWClient.shared.database.getDocument(
@@ -90,12 +94,19 @@ struct AWClient {
             throw error
         }
     }
-    static func createDocument(collection: AWCollection, documentId: String, data: String) async throws {
+    
+    
+    /// Creates a document from a model
+    /// - Parameters:
+    ///   - collection: model's collection
+    ///   - model: model
+    static func createDocument<T: Codable & Identifiable>(collection: AWCollection, model: T) async throws {
         do {
+            let data = try convertToJsonString(model)
             _ = try await AWClient.shared.database.createDocument(
                 databaseId: AWConfig.database.id,
                 collectionId: collection.id,
-                documentId: documentId,
+                documentId: model.id as! String,
                 data: data
             )
         } catch {
@@ -104,16 +115,36 @@ struct AWClient {
         }
     }
     
+    static func updateDocument<T: Codable & Identifiable>(collection: AWCollection, model: T, docId: String) async throws {
+        do {
+            let jsonData = try convertToJsonString(model)
+            let _ = try await AWClient.shared.database.updateDocument(
+                databaseId: AWConfig.database.id,
+                collectionId: collection.id,
+                documentId: docId,
+                data: jsonData
+            )
+        } catch {
+            logger.error("\(error.localizedDescription)")
+            throw error
+        }
+    }
+    
+    
+    /// Uploads an Image to Appwrite and saves it on cache using `ImageCacheManager`
+    /// - Parameters:
+    ///   - bucket: image's bucket
+    ///   - image:
     @MainActor
     static func uploadImage(bucket: AWBucket, image: Image) async throws {
         do {
             let renderer = ImageRenderer(content: image)
             guard let uiImage = renderer.uiImage else {
-                print("Cant upload image")
+                print("Can't create UIImage")
                 return
             }
-            guard let imageData = uiImage.jpegData(compressionQuality: 0.7) else {
-                print("Can't create data from image")
+            guard let imageData = uiImage.jpegData(compressionQuality: 0.75) else {
+                print("Can't create image data form UIImage")
                 return
             }
             let fileId = ID.unique()
@@ -126,12 +157,39 @@ struct AWClient {
                     mimeType: "image/jpeg"
                 )
             )
+            ImageCacheManager.shared.saveImage(uiImage, forKey: fileId)
+            
         } catch {
             logger.error("\(error.localizedDescription)")
             throw error
         }
     }
     
+    
+    /// Downloads and cache an Image. At first it search on cache to get the image, if it's not, it gets the image from Appwrite and saves it on cache.
+    /// - Parameters:
+    ///   - bucket: image's bucket
+    ///   - imageId: image ID
+    /// - Returns: Image if it's founded, nil if not
+    static func downloadAndCacheImage(for bucket: AWBucket, imageId: String) async -> Image? {
+        if let cachedImage = ImageCacheManager.shared.getImage(forKey: imageId) {
+            return Image(uiImage: cachedImage)
+        }
+        
+        do {
+            let awImage = try await AWClient.shared.storage.getFilePreview(
+                bucketId: bucket.id,
+                fileId: imageId
+            )
+            let dataImage = Data(buffer: awImage)
+            guard let uiImage = UIImage(data: dataImage) else { return nil }
+            ImageCacheManager.shared.saveImage(uiImage, forKey: imageId)
+            return Image(uiImage: uiImage)
+        } catch {
+            logger.error("\(error.localizedDescription)")
+            return nil
+        }
+    }
 }
 
 extension AWClient {
