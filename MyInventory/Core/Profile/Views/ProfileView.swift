@@ -21,7 +21,7 @@ struct ProfileView: View {
                         .blur(radius: 0.5)
                         .clipped()
                     VStack(alignment: .center) {
-                        if let profile = authVM.user?.profileImage {
+                        if let profile = authVM.user?.avatar {
                             Image(profile.rawValue)
                                 .resizable()
                                 .frame(width: 80, height: 80)
@@ -82,7 +82,7 @@ struct ProfileView: View {
                 .scrollContentBackground(.hidden)
             }
             .safeAreaPadding(.top, 20)
-            .background(.bgWeak100)
+            .background(.neutral100)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {

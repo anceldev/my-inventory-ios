@@ -43,10 +43,26 @@ struct Box: Codable, Identifiable {
 }
 
 extension Box {
-    static var preview = Box(
-        name: "Balls",
+    static var preview1 = Box(
+        name: "Pelotas",
         inventoryId: Inventory.preview.id,
-        createdBy: User.preview.id
+        createdBy: User.previewJuan.id
     )
+    static var preview2 = Box(
+        name: "Decoración",
+        inventoryId: Inventory.preview.id,
+        createdBy: User.previewJuan.id
+    )
+    static var preview3 = Box(
+        name: "Detalles",
+        inventoryId: Inventory.preview.id,
+        createdBy: User.previewJuan.id
+    )
+    
+    static var boxesPreview: [Box] = [
+        Self.preview1,
+        Self.preview2,
+        Self.preview3
+    ]
 }
 

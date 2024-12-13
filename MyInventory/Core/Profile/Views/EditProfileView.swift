@@ -14,7 +14,7 @@ struct EditProfileView: View {
     @State private var newName: String
     @State private var newUsername: String
     @State private var showProfilePicker = false
-    @State private var selectedProfile: ProfileImage?
+    @State private var selectedProfile: AvatarImage?
     
     let columns = [
         GridItem(.adaptive(minimum: 100))
@@ -24,7 +24,7 @@ struct EditProfileView: View {
         self.user = user
         self._newName = State(initialValue: user.name)
         self._newUsername = State(initialValue: user.username)
-        self._selectedProfile = State(initialValue: user.profileImage)
+        self._selectedProfile = State(initialValue: user.avatar)
     }
     var body: some View {
         VStack {
@@ -64,8 +64,9 @@ struct EditProfileView: View {
             
             
             VStack(spacing: 16) {
-                CustomTextField("Name", text: $newName, fieldType: .name)
-                CustomTextField("Username", text: $newUsername, fieldType: .name)
+//                TextField("Nombre", text: <#T##Binding<String>#>)
+//                CustomTextField("Name", text: $newName, fieldType: .name)
+//                CustomTextField("Username", text: $newUsername, fieldType: .name)
                 Spacer()
             }
             .padding(24)
@@ -87,7 +88,7 @@ struct EditProfileView: View {
                 .tint(.green)
             }
         }
-        .background(.bgWeak100)
+        .background(.neutral100)
         .sheet(isPresented: $showProfilePicker) {
             VStack(spacing: 20) {
                 VStack {
@@ -98,7 +99,7 @@ struct EditProfileView: View {
                 .frame(height: 100)
                 .background(.gray.opacity(0.15))
                 LazyVGrid(columns: columns) {
-                    ForEach(ProfileImage.allCases, id:\.self) { profile in
+                    ForEach(AvatarImage.allCases, id:\.self) { profile in
                         Image(profile.rawValue)
                             .resizable()
                             .frame(width: 80, height: 80)
@@ -129,7 +130,7 @@ struct EditProfileView: View {
                     name: newName,
                     username: newUsername,
                     email: user.email,
-                    profileImage: selectedProfile
+                    avatar: selectedProfile ?? .avatarDefault
                 )
                 try await AWClient.updateDocument(
                     collection: .users,
@@ -138,7 +139,7 @@ struct EditProfileView: View {
                 )
                 authVM.user?.name = newName
                 authVM.user?.username = newUsername
-                authVM.user?.profileImage = selectedProfile
+                authVM.user?.avatar = selectedProfile ?? .avatarDefault
             } catch {
                 logger.error("\(error.localizedDescription)")
             }
