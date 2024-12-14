@@ -54,10 +54,17 @@ struct Item: Codable, Identifiable {
     }
 }
 
-enum ItemStatus: String, Codable {
+enum ItemStatus: String, Codable, Identifiable, CaseIterable {
     case new = "Nuevo"
     case used = "Usado"
     case damaged = "Roto"
+    
+    var id: String {
+        self.rawValue
+    }
+    var icon: String {
+        return ""
+    }
 }
 
 extension Item {

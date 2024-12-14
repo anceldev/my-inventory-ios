@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RootView: View {
     
+    
     enum Tabs: String, Identifiable {
         case profile
         case add
@@ -19,12 +20,30 @@ struct RootView: View {
         }
     }
     
-    @State private var selectedTab: Tabs?
+    @State private var selectedTab: Tabs = .inventories
+    
+    init() {
+        UITabBar.appearance().backgroundColor = .clear
+        UITabBar.appearance().unselectedItemTintColor = UIColor(.neutral300)
+//        UITabBar.appearance().tintColor = UIColor(.text)
+    }
     
     var body: some View {
-        VStack {
+        TabView(selection: $selectedTab) {
             InventoriesListView()
+                .tabItem {
+                    Label("Invetories", systemImage: selectedTab == .inventories ? "shippingbox.fill" : "shippingbox")
+                }
+                .tag(Tabs.inventories)
+            ProfileView()
+                .tabItem {
+                    Label("Profile", systemImage: selectedTab == .profile ? "person.fill" : "person")
+                }
+                .tag(Tabs.profile)
         }
+        .tint(.neutral600)
+        .animation(.easeOut, value: selectedTab)
+        .transition(.slide)
     }
 }
 

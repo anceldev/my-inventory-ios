@@ -66,25 +66,49 @@ struct InventoriesListView: View {
                     ForEach(Inventory.inventoriesPreview) { inventory in
                         InventoryRow(inventory)
                     }
-                    .navigationDestination(for: Inventory.self) { inventory in
-                        Text(inventory.name)
-                    }
+                    
                 }
                 .scrollIndicators(.hidden)
             }
             .padding([.horizontal, .bottom], 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.neutral100)
-            
-        }
-        .toolbar {
-            NavigationLink {
-                CreateInventoryView()
-                    .navigationBarBackButtonHidden()
-            } label: {
-                Label("Add inventory", systemImage: "plus")
+            .background(.neutral200)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack {
+                        NavigationLink {
+                            CreateInventoryView()
+                                .navigationBarBackButtonHidden()
+                        } label: {
+                            Label("Add inventory", systemImage: "plus")
+                        }
+                        .tint(.neutral500)
+                        NavigationLink {
+                            ProfileView()
+                        } label: {
+                            Label("Ajusts", systemImage: "slider.horizontal.3")
+                        }
+                        .tint(.neutral500)
+                    }
+                }
+//                ToolbarItem(placement: .topBarTrailing) {
+//                    NavigationLink {
+//                        CreateInventoryView()
+//                            .navigationBarBackButtonHidden()
+//                    } label: {
+//                        Label("Add inventory", systemImage: "plus")
+//                    }
+//                    .tint(.neutral500)
+//                }
+//                ToolbarItem(placement: .topBarTrailing) {
+//                    NavigationLink {
+//                        ProfileView()
+//                    } label: {
+//                        Label("Ajusts", systemImage: "slider.horizontal.3")
+//                    }
+//
+//                }
             }
-            .tint(.neutral500)
         }
     }
 }

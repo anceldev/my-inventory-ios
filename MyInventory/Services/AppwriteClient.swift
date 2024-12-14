@@ -87,7 +87,6 @@ struct AWClient {
             let documentData = try convertToData(document.data)
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
-            print(String(data: documentData, encoding: .utf8))
             let model = try decoder.decode(T.self, from: documentData)
             return model
         } catch {
@@ -95,7 +94,6 @@ struct AWClient {
             throw error
         }
     }
-    
     
     /// Creates a document from a model
     /// - Parameters:

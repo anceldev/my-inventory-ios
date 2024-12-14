@@ -16,11 +16,15 @@ struct AddBoxView: View {
             Text("Nueva caja")
                 .font(.system(size: 38, weight: .bold))
                 .foregroundStyle(.neutral700)
-            VStack {
+            VStack(spacing: 16) {
                 TextField("Nombre", text: $name)
                     .customTextField(icon: "shippingbox")
+                    .autocorrectionDisabled()
+                    .submitLabel(.go)
+                    .onSubmit {
+                        createBox()
+                    }
                 Button {
-                    print("Add box")
                     createBox()
                 } label: {
                     Text("Añadir")
@@ -38,7 +42,7 @@ struct AddBoxView: View {
         .background(.neutral200)
     }
     private func createBox() {
-        
+        print("Add box")
         dismiss()
     }
 }

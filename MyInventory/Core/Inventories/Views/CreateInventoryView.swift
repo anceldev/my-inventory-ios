@@ -10,14 +10,14 @@ import SwiftUI
 struct CreateInventoryView: View {
     
     @Environment(\.dismiss) private var dismiss
-
+    
     @State private var showNewBoxForm = false
     @State private var name = ""
     @State private var description = ""
     @State private var ownerId = ""
     @State private var sharedWith: [String] = []
     @State private var isShared = false
-
+    
     var body: some View {
         VStack {
             ScrollView(.vertical) {
@@ -31,7 +31,7 @@ struct CreateInventoryView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 VStack(spacing: 16) {
                     TextField(text: $name) {
-                        Text("Dale un nombre a tu inventario...")
+                        Text("Dale un nombre al inventario...")
                     }
                     .customTextField("Nombre")
                     
@@ -39,7 +39,6 @@ struct CreateInventoryView: View {
                         Text("Añade una descripción...")
                     }
                     .customTextField("Descripción")
-                    
                     HStack {
                         Text("Cajas")
                             .font(.system(size: 14))
@@ -48,37 +47,28 @@ struct CreateInventoryView: View {
                             showNewBoxForm.toggle()
                         } label: {
                             Text("Añadir")
-                                .font(.system(size: 14))
+                                .font(.system(size: 14, weight: .medium))
                                 .underline()
                         }
                     }
                     if true {
                         BoxesList()
                     }
-                    
-//                    Toggle(
-//                        "Tipo: \(isShared ? "Compartido" : "Solo")", isOn: $isShared
-//                    )
-//                    .font(.system(size: 14))
-//                    .animation(.easeInOut, value: isShared)
-                    
-                    Toggle(isOn: $isShared) {
-                        HStack(alignment: .bottom) {
-                            Text("Tipo:")
-                                .font(.system(size: 14))
-                            HStack {
-                                Image(systemName: isShared ? "globe.americas.fill" : "person.fill")
-                                    .foregroundStyle(isShared ? .blueBase : .pinkDark)
-                                Text(isShared ? "Compartido" : "Solo")
-                                    .foregroundStyle(.neutral500)
-                                    .animation(.easeIn, value: isShared)
-                            }
-                            .italic()
-                            .font(.system(size: 16))
+                    HStack(alignment: .bottom) {
+                        Text("Tipo:")
+                            .font(.system(size: 14))
+                        HStack {
+                            Image(systemName: isShared ? "globe.americas.fill" : "person.fill")
+                                .foregroundStyle(isShared ? .purpleBase : .blueBase)
+                            Text(isShared ? "Compartido" : "Solo")
+                                .foregroundStyle(.neutral500)
+                                .animation(.easeIn, value: isShared)
                         }
+                        .italic()
+                        .font(.system(size: 16))
+                        Spacer()
+                        CustomToggle(isOn: $isShared)
                     }
-                    .animation(.easeInOut, value: isShared)
-                    
                     if isShared {
                         VStack {
                             ScrollView(.vertical) {
@@ -99,7 +89,8 @@ struct CreateInventoryView: View {
         .background(.neutral100)
         .sheet(isPresented: $showNewBoxForm) {
             AddBoxView()
-                .presentationDetents([.height(198)])
+                .presentationDetents([.height(206)])
+                .presentationBackground(Color.neutral200)
         }
         .toolbar {
             ToolbarItem(placement: .navigation) {

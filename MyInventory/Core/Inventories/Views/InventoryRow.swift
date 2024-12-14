@@ -47,6 +47,9 @@ struct InventoryRow: View {
                         }
                         .background(.white, in: .circle)
                     }
+                    .navigationDestination(for: Inventory.self) { inventory in
+                        Text(inventory.name)
+                    }
                     HStack {
                         ForEach(Array(inventory.users.enumerated()), id: \.element.id) { index, user in
                             VStack(alignment: .leading) {
@@ -92,15 +95,17 @@ struct InventoryRow: View {
         .background(.neutral200.opacity(0.5))
         .frame(maxWidth: .infinity)
         .clipShape(RoundedRectangle(cornerRadius: 18))
+//        .shadow(color: .neutral400, radius: 5)
         .overlay {
             RoundedRectangle(cornerRadius: 18)
-                .stroke(.neutral300, lineWidth: 1)
-                .shadow(color: .neutral400, radius: 5)
+                .stroke(.neutral400.opacity(0.5), lineWidth: 1)
+                .shadow(color: .neutral400, radius: 5, x:4 , y:2)
         }
+        
     }
 }
-
-#Preview(traits: .sizeThatFitsLayout, body: {
-    InventoryRow(Inventory.preview)
-        .padding(20)
-})
+//
+//#Preview(traits: .sizeThatFitsLayout, body: {
+//    InventoryRow(Inventory.preview)
+//        .padding(20)
+//})

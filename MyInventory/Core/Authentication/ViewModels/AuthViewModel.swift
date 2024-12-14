@@ -28,7 +28,7 @@ enum AuthFlow {
 class AuthViewModel {
     var state: AuthState = .unauthenticated
     var authFlow: AuthFlow = .signIn
-    var errorMessage: String? = ""
+    var errorMessage: String? = nil
     var user: User?
     
     var username: String = ""
