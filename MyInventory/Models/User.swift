@@ -64,8 +64,8 @@ struct User: Identifiable, Codable {
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.name, forKey: .name)
-        try container.encode(self.username, forKey: .username)
-        try container.encode(self.email, forKey: .email)
+        try container.encode(self.username.lowercased(), forKey: .username)
+        try container.encode(self.email.lowercased(), forKey: .email)
         try container.encode(self.avatar, forKey: .avatar)
         try container.encode(self.following, forKey: .following)
     }

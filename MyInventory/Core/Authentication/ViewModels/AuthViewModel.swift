@@ -9,8 +9,17 @@ import Foundation
 import Appwrite
 import Observation
 import Logging
+import Combine
 
-
+enum AuthError: Error {
+    case existingUsername
+    
+    var message: String {
+        switch self {
+        case .existingUsername: "Ya existe una cuenta con el mismo nombre de usuario."
+        }
+    }
+}
 
 enum AuthState {
     case unauthenticated
@@ -26,12 +35,26 @@ enum AuthFlow {
 
 @Observable
 class AuthViewModel {
-    var state: AuthState = .unauthenticated
+    var state: AuthState = .authenticating
     var authFlow: AuthFlow = .signIn
     var errorMessage: String? = nil
     var user: User?
     
-    var username: String = ""
+    
+//    var username: String = ""
+    var username: String = "" {
+        didSet {
+            Task {
+                await debounceUsernameCheck()
+            }
+        }
+    }
+    var isUsernameAvailable: Bool?
+    var isChecking: Bool = false
+    private var debounceTask: Task<Void, Never>?
+    private let debounceInterval: TimeInterval = 0.5
+    
+    
     var email: String = ""
     var password: String = ""
     
@@ -42,6 +65,47 @@ class AuthViewModel {
             await checkForExistingSession()
         }
     }
+    
+    @MainActor
+        private func debounceUsernameCheck() async {
+            print("testing username")
+            debounceTask?.cancel()
+            
+            guard !username.isEmpty else {
+                isUsernameAvailable = nil
+                isChecking = false
+                return
+            }
+            
+            debounceTask = Task {
+                isChecking = true
+                
+                do {
+                    try await Task.sleep(nanoseconds: UInt64(debounceInterval * 1_000_000_000))
+                    
+                    if Task.isCancelled { return }
+                    
+//                    let isAvailable = await checkUsernameAvailability(username)
+                    let isAvailable = try await isUsernameAvailable()
+                    
+                    if Task.isCancelled { return }
+                    
+                    await MainActor.run {
+                        isUsernameAvailable = isAvailable
+                    }
+                } catch {
+                    print("Debounce task cancelled")
+                }
+                
+                await MainActor.run {
+                    isChecking = false
+                }
+            }
+        }
+    
+    
+    
+    
     
     func signIn() async throws {
         do {
@@ -100,9 +164,15 @@ class AuthViewModel {
             }
             self.state = .unauthenticated
             self.errorMessage = "Invalid email or password"
-            
         } catch {
             self.state = .unauthenticated
+            if let awError = error as? AppwriteError {
+                if awError.code == 409 {
+                    self.errorMessage = "Ya existe una cuenta con el mismo nombre de usuario o correo electrónico."
+                    logger.error("\(error.localizedDescription)")
+                    return
+                }
+            }
             self.errorMessage = error.localizedDescription
             logger.error("\(error.localizedDescription)")
         }
@@ -118,6 +188,27 @@ class AuthViewModel {
         }
     }
     
+    func isUsernameAvailable() async throws -> Bool {
+        do {
+            let queries = [Query.equal("username", value: self.username.lowercased())]
+            let existingUser: [User] = try await AWClient.getDocumentsWithQuery(collection: .users, queries: queries)
+            if existingUser.count > 0 {
+                throw AuthError.existingUsername
+            }
+            self.errorMessage = nil
+            return true
+        } catch {
+            logger.error("\(error.localizedDescription)")
+            if let authError = error as? AuthError {
+                self.errorMessage = authError.message
+                return false
+            }
+            self.errorMessage = error.localizedDescription
+            print(self.errorMessage ?? "Error founded")
+            return false
+        }
+    }
+    
     private func checkForExistingSession() async {
         do {
             self.state = .authenticating
@@ -126,9 +217,12 @@ class AuthViewModel {
             self.user = user
             self.state = .authenticated(user)
         } catch {
-            logger.error("\(error.localizedDescription)")
-            self.errorMessage = error.localizedDescription
             self.state = .unauthenticated
+            if let appwriteError = error as? AppwriteError {
+                if appwriteError.code != 401 {
+                    self.errorMessage = error.localizedDescription
+                }
+            }
             return
         }
     }

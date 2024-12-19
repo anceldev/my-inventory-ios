@@ -95,6 +95,25 @@ struct AWClient {
         }
     }
     
+    static func getDocumentsWithQuery<T: Codable>(collection: AWCollection, queries: [String]) async throws -> [T] {
+        do {
+            let documents = try await AWClient.shared.database.listDocuments(
+                databaseId: AWConfig.database.id,
+                collectionId: collection.id,
+                queries: queries
+            )
+            return try documents.documents.map { doc in
+//                let jsonData = try JSONSerialization.data(withJSONObject: doc.data)
+                let data = try convertToData(doc.data)
+                print(String(decoding: data, as: UTF8.self))
+                return try JSONDecoder().decode(T.self, from: data)
+            }
+        } catch {
+            logger.error("\(error.localizedDescription)")
+            throw error
+        }
+    }
+    
     /// Creates a document from a model
     /// - Parameters:
     ///   - collection: model's collection

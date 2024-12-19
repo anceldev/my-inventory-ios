@@ -15,7 +15,7 @@ struct ProfileView: View {
         if let avatar = authVM.user?.avatar {
             return Image(avatar.rawValue)
         }
-        return Image(systemName: "person")
+        return Image(AvatarImage.avatarDefault.rawValue)
     }
     var body: some View {
         NavigationStack {
@@ -25,6 +25,10 @@ struct ProfileView: View {
                         .resizable()
                         .aspectRatio(1/1, contentMode: .fill)
                         .frame(width: 140, height: 140)
+                        .overlay {
+                            Circle()
+                                .stroke(.white, lineWidth: 5)
+                        }
                     VStack(spacing: 4) {
                         Text(authVM.user?.name.capitalized ?? "No-name")
                             .font(.system(size: 28, weight: .medium))
@@ -42,34 +46,44 @@ struct ProfileView: View {
                 Divider()
                 
                 VStack(spacing: 16) {
-                    NavigationLink {
-                        Text("ShareQR")
-                    } label: {
-                        ProfileRow("Compartir QR", description: "Comparte tu perfil con otros") {
-                            ShareQRRowImage()
+                    ScrollView(.vertical) {
+                        NavigationLink {
+                            Text("ShareQR")
+                        } label: {
+                            ProfileRow("Compartir QR", description: "Comparte tu perfil con otros") {
+                                ShareQRRowImage()
+                            }
+                        }
+                        
+                        NavigationLink {
+                            EditProfileView(for: authVM.user ?? User.preview)
+                        } label: {
+                            ProfileRow("Editar perfil", description: "Editar ajustes de perfil") {
+                                EditProfileRowImage()
+                            }
+                        }
+                        NavigationLink {
+                            UsersListView()
+                        } label: {
+                            ProfileRow("Mis amigos", description: "Lista de amigos") {
+                                MyFriendsRowImage()
+                            }
+                        }
+                        Button {
+                            signOut()
+                        } label: {
+                            ProfileRow("Cerrar sesión", description: "Cerrar sesión en el dispositivo") {
+                                SignOutRowImage()
+                            }
                         }
                     }
+                    .scrollIndicators(.hidden)
 
-                    NavigationLink {
-                        EditProfileView(for: authVM.user ?? User.preview)
-                    } label: {
-                        ProfileRow("Editar perfil", description: "Editar ajustes de perfil") {
-                            EditProfileRowImage()
-                        }
-                    }
-                    NavigationLink {
-                        UsersListView()
-                    } label: {
-                        ProfileRow("Mis amigos", description: "Lista de amigos") {
-                            MyFriendsRowImage()
-                        }
-                    }
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-                Spacer()
             }
             .safeAreaPadding(.top, 30)
-            .padding([.horizontal, .bottom], 24)
+            .padding([.horizontal], 24)
             .background(.neutral100)
         }
     }
@@ -131,6 +145,14 @@ struct ProfileView: View {
             .resizable()
             .frame(width: 40, height: 40, alignment: .center)
             .rotationEffect(.degrees(15))
+    }
+    @ViewBuilder
+    func SignOutRowImage() -> some View {
+        Image(systemName: "door.left.hand.open")
+            .resizable()
+            .frame(width: 25, height: 40, alignment: .center)
+            .rotationEffect(.degrees(15))
+            .foregroundStyle(.redDark)
     }
 }
 

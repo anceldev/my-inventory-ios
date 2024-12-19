@@ -71,18 +71,35 @@ struct SignUp: View {
             Button {
                 signUp()
             } label: {
-                Text("Sign Un")
+                Text("Sign Up")
             }
             .buttonStyle(.borderedProminent)
+            if let errorMessage = authVM.errorMessage {
+                Text(errorMessage)
+                    .foregroundStyle(.redBase)
+                    .frame(maxWidth: .infinity)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(24)
         .background(.neutral100)
+        .animation(.easeIn, value: authVM.errorMessage)
+//        .onChange(of: authVM.username) {
+//            if !authVM.username.isEmpty {
+//                checkAvailableUsername()
+//            }
+//        }
     }
-    
+//    private func checkAvailableUsername() {
+//        Task {
+//            try await authVM.isUsernameAvailable()
+//        }
+//    }
     private func signUp() {
+        focused = nil
         Task {
             do {
+                try await authVM.isUsernameAvailable()
                 try await authVM.signUp()
             } catch {
                 return

@@ -25,7 +25,6 @@ struct RootView: View {
     init() {
         UITabBar.appearance().backgroundColor = .clear
         UITabBar.appearance().unselectedItemTintColor = UIColor(.neutral300)
-//        UITabBar.appearance().tintColor = UIColor(.text)
     }
     
     var body: some View {
@@ -34,14 +33,12 @@ struct RootView: View {
                 .tabItem {
                     Label("Invetarios", systemImage: selectedTab == .inventories ? "shippingbox.fill" : "shippingbox")
                         .labelStyle(.iconOnly)
-//                    Image(systemName: selectedTab == .inventories ? "shippingbox.fill" : "shippingbox")
                 }
                 .tag(Tabs.inventories)
             ProfileView()
                 .tabItem {
                     Label("Perfil", systemImage: selectedTab == .profile ? "person.fill" : "person")
                         .labelStyle(.iconOnly)
-//                    Image(systemName: selectedTab == .profile ? "person.fill" : "person")
                 }
                 .tag(Tabs.profile)
         }

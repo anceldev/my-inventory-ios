@@ -77,6 +77,7 @@ struct SignIn: View {
     }
     
     private func signIn() {
+        focused = nil
         Task {
             do {
                 try await authVM.signIn()
