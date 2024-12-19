@@ -9,6 +9,12 @@ import SwiftUI
 
 struct CreateInventoryView: View {
     
+    enum FormFields {
+        case name
+        case description
+    }
+    @FocusState private var focused: FormFields?
+    
     @Environment(\.dismiss) private var dismiss
     
     @State private var showNewBoxForm = false
@@ -34,11 +40,22 @@ struct CreateInventoryView: View {
                         Text("Dale un nombre al inventario...")
                     }
                     .customTextField("Nombre")
+                    .focused($focused, equals: .name)
+                    .submitLabel(.next)
+                    .onSubmit {
+                        focused = .description
+                    }
                     
                     TextField(text: $description) {
                         Text("Añade una descripción...")
                     }
                     .customTextField("Descripción")
+                    .focused($focused, equals: .description)
+                    .submitLabel(.done)
+                    .onSubmit {
+                        focused = nil
+                    }
+                    
                     HStack {
                         Text("Cajas")
                             .font(.system(size: 14))
@@ -86,11 +103,12 @@ struct CreateInventoryView: View {
             .scrollIndicators(.hidden)
         }
         .padding([.horizontal, .bottom],24)
-        .background(.neutral100)
+        .background(.neutral200)
         .sheet(isPresented: $showNewBoxForm) {
             AddBoxView()
                 .presentationDetents([.height(206)])
                 .presentationBackground(Color.neutral200)
+                .presentationDragIndicator(.visible)
         }
         .toolbar {
             ToolbarItem(placement: .navigation) {

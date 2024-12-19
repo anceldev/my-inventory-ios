@@ -10,91 +10,67 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(AuthViewModel.self) var authVM
     @Environment(\.dismiss) var dismiss
+    
+    var profileImage: Image {
+        if let avatar = authVM.user?.avatar {
+            return Image(avatar.rawValue)
+        }
+        return Image(systemName: "person")
+    }
     var body: some View {
         NavigationStack {
-        
             VStack(spacing: 24) {
-                ZStack {
-                    Image(.previewBackdrop)
+                VStack {
+                    profileImage
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .blur(radius: 0.5)
-                        .clipped()
-                    VStack(alignment: .center) {
-                        if let profile = authVM.user?.avatar {
-                            Image(profile.rawValue)
-                                .resizable()
-                                .frame(width: 80, height: 80)
-                        } else {
-                            Image(systemName: "person")
-                                .resizable()
-                                .frame(width: 80, height: 80)
-                        }
-                        Text("@\(authVM.user?.username ?? "NO-NAME")")
-                            .foregroundStyle(.white)
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .shadow(color: .black, radius: 1)
+                        .aspectRatio(1/1, contentMode: .fill)
+                        .frame(width: 140, height: 140)
+                    VStack(spacing: 4) {
+                        Text(authVM.user?.name.capitalized ?? "No-name")
+                            .font(.system(size: 28, weight: .medium))
+                            .foregroundStyle(.neutral600)
+                        Text("@\(authVM.user?.username ?? "NO-USERNAME")")
+                            .foregroundStyle(.neutral500)
+                            .fontWeight(.light)
+                            .font(.system(size: 14))
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: 16  ))
                 .padding(.horizontal, 20)
+                .padding(.bottom, 16)
                 .frame(maxWidth: .infinity)
-                .frame(height: 200)
-                List {
-                    Section{
-                        NavigationLink {
-                            EditProfileView(for: authVM.user ?? User.preview)
-                                .environment(authVM)
-                        } label: {
-                            HStack {
-                                Label("person", systemImage: "person.circle.fill")
-                                    .labelStyle(.iconOnly)
-                                    .font(.title2)
-                                    .foregroundStyle(.blue)
-                                Text("Edit profile")
-                            }
-                        }
-                        .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 16))
-                        Button {
-                            signOut()
-                        } label: {
-                            
-                            HStack(alignment: .center) {
-                                Label("person", systemImage: "rectangle.portrait.and.arrow.right")
-                                    .labelStyle(.iconOnly)
-                                    .foregroundStyle(.red)
-                                    .padding(.leading, 5)
-                                Text("Sign out")
-                                    .foregroundStyle(.black.opacity(0.6))
-                            }
-                        }
-                        .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 16))
-                    } header: {
-                        Text("Account")
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.black)
-                            .textCase(.none)
-                    }
-                }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
-            }
-            .safeAreaPadding(.top, 20)
-            .background(.neutral100)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        dismiss()
+                Divider()
+                
+                VStack(spacing: 16) {
+                    NavigationLink {
+                        Text("ShareQR")
                     } label: {
-                        Text("Close")
+                        ProfileRow("Compartir QR", description: "Comparte tu perfil con otros") {
+                            ShareQRRowImage()
+                        }
                     }
 
+                    NavigationLink {
+                        EditProfileView(for: authVM.user ?? User.preview)
+                    } label: {
+                        ProfileRow("Editar perfil", description: "Editar ajustes de perfil") {
+                            EditProfileRowImage()
+                        }
+                    }
+                    NavigationLink {
+                        UsersListView()
+                    } label: {
+                        ProfileRow("Mis amigos", description: "Lista de amigos") {
+                            MyFriendsRowImage()
+                        }
+                    }
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                Spacer()
             }
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.inline)
+            .safeAreaPadding(.top, 30)
+            .padding([.horizontal, .bottom], 24)
+            .background(.neutral100)
         }
     }
     private func signOut() {
@@ -102,12 +78,67 @@ struct ProfileView: View {
             await authVM.signOut()
         }
     }
+    
+    @ViewBuilder
+    func MyFriendsRowImage() -> some View {
+        ZStack {
+            Image(AvatarImage.avatarMen1.rawValue)
+                .resizable()
+                .frame(width: 60, height: 60)
+                .clipShape(.circle)
+                .overlay {
+                    Circle().stroke(.white, lineWidth: 3)
+                }
+                .rotationEffect(.degrees(-15))
+                .offset(x: -30, y: 0)
+            Image(AvatarImage.avatarMen2.rawValue)
+                .resizable()
+                .frame(width: 60, height: 60)
+                .clipShape(.circle)
+                .overlay {
+                    Circle()
+                        .stroke(.white, lineWidth: 3)
+                }
+                .offset(x: 0, y: -10)
+                .opacity(0.95)
+            Image(AvatarImage.avatarWomen2.rawValue)
+                .resizable()
+                .frame(width: 60, height: 60)
+                .clipShape(.circle)
+                .overlay {
+                    Circle()
+                        .stroke(.white, lineWidth: 3)
+                }
+                .offset(x: 30, y: 0)
+                .opacity(0.95)
+        }
+        .offset(x: -10)
+    }
+    @ViewBuilder
+    func EditProfileRowImage() -> some View {
+        Image(AvatarImage.avatarMen1.rawValue)
+            .resizable()
+            .frame(width: 60, height: 60)
+            .clipShape(.circle)
+            .overlay {
+                Circle().stroke(.white, lineWidth: 3)
+            }
+            .rotationEffect(.degrees(-15))
+    }
+    @ViewBuilder
+    func ShareQRRowImage() -> some View {
+        Image(systemName: "qrcode")
+            .resizable()
+            .frame(width: 40, height: 40, alignment: .center)
+            .rotationEffect(.degrees(15))
+    }
 }
 
-
 #Preview {
-    NavigationStack {
+    let authVM = AuthViewModel()
+    authVM.user = User.preview
+    return NavigationStack {
         ProfileView()
-            .environment(AuthViewModel())
+            .environment(authVM)
     }
 }

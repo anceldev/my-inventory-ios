@@ -28,45 +28,65 @@ struct EditProfileView: View {
     }
     var body: some View {
         VStack {
-            if selectedProfile != nil {
-                Image(selectedProfile!.rawValue)
-                    .resizable()
-                    .foregroundStyle(.white)
-                    .frame(width: 80, height: 80)
-                    .clipShape(.circle)
-                    .overlay(alignment: .bottomTrailing) {
-                        Image(systemName: "pencil")
-                            .padding(4)
-                            .background(.green)
-                            .clipShape(.circle)
-                            .onTapGesture {
-                                showProfilePicker.toggle()
-                            }
-                    }
-            } else {
-                Image(systemName: "person")
-                    .resizable()
-                    .padding()
-                    .background(.orange)
-                    .foregroundStyle(.white)
-                    .frame(width: 80, height: 80)
-                    .clipShape(.circle)
-                    .overlay(alignment: .bottomTrailing) {
-                        Image(systemName: "pencil")
-                            .padding(4)
-                            .background(.green)
-                            .clipShape(.circle)
-                            .onTapGesture {
-                                showProfilePicker.toggle()
-                            }
-                    }
+            VStack {
+                if selectedProfile != nil {
+                    Image(selectedProfile!.rawValue)
+                        .resizable()
+                        .foregroundStyle(.white)
+                        .frame(width: 140, height: 140)
+                        .clipShape(.circle)
+                        .overlay {
+                            Circle()
+                                .stroke(.white, lineWidth: 5)
+                        }
+                        .overlay(alignment: .bottomTrailing) {
+                            Image(systemName: "pencil")
+                                .padding(8)
+                                .background(.green)
+                                .clipShape(.circle)
+                                .onTapGesture {
+                                    showProfilePicker.toggle()
+                                }
+                        }
+                } else {
+                    Image(AvatarImage.avatarDefault.rawValue)
+                        .resizable()
+                        .padding()
+                        .background(.orange)
+                        .foregroundStyle(.white)
+                        .frame(width: 140, height: 140)
+                        .clipShape(.circle)
+                        .overlay(alignment: .bottomTrailing) {
+                            Image(systemName: "pencil")
+                                .padding(4)
+                                .background(.green)
+                                .clipShape(.circle)
+                                .onTapGesture {
+                                    showProfilePicker.toggle()
+                                }
+                        }
+                }
             }
+            .padding(.top, 20)
             
             
             VStack(spacing: 16) {
-//                TextField("Nombre", text: <#T##Binding<String>#>)
-//                CustomTextField("Name", text: $newName, fieldType: .name)
-//                CustomTextField("Username", text: $newUsername, fieldType: .name)
+                TextField("Nombre", text: $newName)
+                    .customTextField("Nombre")
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    .submitLabel(.next)
+                    .autocorrectionDisabled()
+                TextField("Nombre de usuario", text: $newUsername)
+                    .customTextField("Usuario")
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    .submitLabel(.next)
+                    .autocorrectionDisabled()
+//                    .focused($focused, equals: .email)
+//                    .onSubmit {
+//                        focused = .password
+//                    }
                 Spacer()
             }
             .padding(24)
@@ -75,48 +95,59 @@ struct EditProfileView: View {
                 Button(role: .destructive) {
                     dismiss()
                 } label: {
-                    Text("Cancel")
+                    Text("Cancelar")
+                        .foregroundStyle(.white)
                 }
-                .buttonStyle(.borderedProminent)
+
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(.redBase)
+                .clipShape(.capsule)
                 
                 Button {
                     updateProfile()
                 } label: {
-                    Text("Update")
+                    Text("Guardar")
+                        .foregroundStyle(.white)
+                        .fontWeight(.semibold)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.green)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(.greenBase)
+                .clipShape(.capsule)
             }
         }
+        .frame(maxWidth: .infinity)
         .background(.neutral100)
         .sheet(isPresented: $showProfilePicker) {
             VStack(spacing: 20) {
                 VStack {
-                    Text("Select profile image")
-                        .font(.title2)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 100)
-                .background(.gray.opacity(0.15))
+                    Text("Selecciona tu avatar")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundStyle(.neutral700)                }
                 LazyVGrid(columns: columns) {
                     ForEach(AvatarImage.allCases, id:\.self) { profile in
-                        Image(profile.rawValue)
-                            .resizable()
-                            .frame(width: 80, height: 80)
-                            .overlay {
-                                Circle()
-                                    .stroke(selectedProfile == profile ? .pink : .clear, lineWidth: 3)
-                            }
-                            .onTapGesture {
-                                withAnimation(.bouncy) {
-                                    selectedProfile = profile
+                        if profile != .avatarDefault {
+                            Image(profile.rawValue)
+                                .resizable()
+                                .frame(width: 80, height: 80)
+                                .overlay {
+                                    Circle()
+                                        .stroke(selectedProfile == profile ? .pink : .clear, lineWidth: 3)
                                 }
-                            }
+                                .onTapGesture {
+                                    withAnimation(.bouncy) {
+                                        selectedProfile = profile
+                                    }
+                                }
+                        }
                     }
                 }
+                .backgroundStyle(.red)
             }
             .presentationDragIndicator(.visible)
-            .presentationDetents([.height(500)])
+            .presentationDetents([.height(480)])
+            .presentationBackground(.neutral200)
         }
     }
     private func updateProfile() {

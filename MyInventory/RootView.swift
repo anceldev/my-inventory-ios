@@ -32,12 +32,16 @@ struct RootView: View {
         TabView(selection: $selectedTab) {
             InventoriesListView()
                 .tabItem {
-                    Label("Invetories", systemImage: selectedTab == .inventories ? "shippingbox.fill" : "shippingbox")
+                    Label("Invetarios", systemImage: selectedTab == .inventories ? "shippingbox.fill" : "shippingbox")
+                        .labelStyle(.iconOnly)
+//                    Image(systemName: selectedTab == .inventories ? "shippingbox.fill" : "shippingbox")
                 }
                 .tag(Tabs.inventories)
             ProfileView()
                 .tabItem {
-                    Label("Profile", systemImage: selectedTab == .profile ? "person.fill" : "person")
+                    Label("Perfil", systemImage: selectedTab == .profile ? "person.fill" : "person")
+                        .labelStyle(.iconOnly)
+//                    Image(systemName: selectedTab == .profile ? "person.fill" : "person")
                 }
                 .tag(Tabs.profile)
         }

@@ -73,9 +73,9 @@ struct User: Identifiable, Codable {
 
 extension User {
     static var preview = User(
-        name: "preview",
-        username: "username",
-        email: "preview@mail.com",
+        name: "Ancel Guarayo",
+        username: "ancelote",
+        email: "ancel@mail.com",
         avatar: .avatarMen1
     )
     

@@ -98,8 +98,8 @@ struct InventoryRow: View {
 //        .shadow(color: .neutral400, radius: 5)
         .overlay {
             RoundedRectangle(cornerRadius: 18)
-                .stroke(.neutral400.opacity(0.5), lineWidth: 1)
-                .shadow(color: .neutral400, radius: 5, x:4 , y:2)
+                .stroke(.white, lineWidth: 2)
+//                .shadow(color: .neutral400, radius: 5, x:4 , y:2)
         }
         
     }
