@@ -10,6 +10,7 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(AuthViewModel.self) var authVM
     @Environment(\.dismiss) var dismiss
+    @State private var suggestionsVM = SuggestionsViewModel()
     
     var profileImage: Image {
         if let avatar = authVM.user?.avatar {
@@ -24,7 +25,7 @@ struct ProfileView: View {
                     profileImage
                         .resizable()
                         .aspectRatio(1/1, contentMode: .fill)
-                        .frame(width: 140, height: 140)
+                        .frame(width: 120, height: 120)
                         .overlay {
                             Circle()
                                 .stroke(.white, lineWidth: 5)
@@ -41,7 +42,7 @@ struct ProfileView: View {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 16  ))
                 .padding(.horizontal, 20)
-                .padding(.bottom, 16)
+//                .padding(.bottom, 16)
                 .frame(maxWidth: .infinity)
                 Divider()
                 
@@ -64,16 +65,65 @@ struct ProfileView: View {
                         }
                         NavigationLink {
                             UsersListView()
+#if DEBUG
+                                .environment(authVM)
+#endif
                         } label: {
                             ProfileRow("Mis amigos", description: "Lista de amigos") {
                                 MyFriendsRowImage()
+                            }
+                        }
+                        NavigationLink {
+                            ImprovementsView()
+                                .environment(suggestionsVM)
+                        } label: {
+                            ProfileRow("Mejoras", description: "Sugiere mejoras al desarrollador") {
+                                ItemRowImage(
+                                    systemName: "lightbulb.max",
+                                    color: .yellowBase,
+                                    size: .init(
+                                        width: 35,
+                                        height: 40
+                                    )
+                                )
+                            }
+                        }
+                        Link(destination: URL(string: "https://anceldev.com")!) {
+                            ProfileRow("Web", description: "Ver términos de uso") {
+                                ItemRowImage(
+                                    systemName: "network",
+                                    color: .tealBase,
+                                    size: .init(width: 40, height: 40)
+                                )
+                            }
+                        }
+                        Link(destination: URL(string: "https://anceldev.com")!) {
+                            ProfileRow("Terminos de uso", description: "Ver términos de uso") {
+                                ItemRowImage(
+                                    systemName: "text.document",
+                                    color: .pinkDarker,
+                                    size: .init(width: 28, height: 40)
+                                )
+                            }
+                        }
+                        Link(destination: URL(string: "https://anceldev.com")!) {
+                            ProfileRow("Privacidad", description: "Ver Política de privacidad") {
+                                ItemRowImage(
+                                    systemName: "lock.document",
+                                    color: .tealDarker,
+                                    size: .init(width: 28, height: 40)
+                                )
                             }
                         }
                         Button {
                             signOut()
                         } label: {
                             ProfileRow("Cerrar sesión", description: "Cerrar sesión en el dispositivo") {
-                                SignOutRowImage()
+                                ItemRowImage(
+                                    systemName: "door.left.hand.open",
+                                    color: .redDark,
+                                    size: .init(width: 25, height: 40)
+                                )
                             }
                         }
                     }
@@ -126,7 +176,7 @@ struct ProfileView: View {
                 .offset(x: 30, y: 0)
                 .opacity(0.95)
         }
-        .offset(x: -10)
+        .offset(x: -20, y: 5)
     }
     @ViewBuilder
     func EditProfileRowImage() -> some View {
@@ -153,6 +203,15 @@ struct ProfileView: View {
             .frame(width: 25, height: 40, alignment: .center)
             .rotationEffect(.degrees(15))
             .foregroundStyle(.redDark)
+    }
+    @ViewBuilder
+    func ItemRowImage(systemName: String, color: Color, size: CGSize) -> some View {
+     
+            Image(systemName: systemName)
+                .resizable()
+                .frame(width: size.width, height: size.height)
+                .rotationEffect(.degrees(15))
+                .foregroundStyle(color)
     }
 }
 

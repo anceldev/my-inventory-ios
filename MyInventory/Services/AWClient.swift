@@ -46,6 +46,7 @@ enum AWCollection {
     case inventories
     case boxes
     case items
+    case suggestions
     
     var id: String {
         switch self {
@@ -53,6 +54,7 @@ enum AWCollection {
         case .users:        Bundle.main.infoDictionary?["AW_USERS_COLLECTION_ID"] as? String ?? ""
         case .inventories:  Bundle.main.infoDictionary?["AW_INVENTORIES_COLLECTION_ID"] as? String ?? ""
         case .boxes:        Bundle.main.infoDictionary?["AW_BOXES_COLLECTION_ID"] as? String ?? ""
+        case .suggestions:  Bundle.main.infoDictionary?["AW_SUGGESTIONS_COLLECTION_ID"] as? String ?? ""
         }
     }
 }
@@ -94,6 +96,27 @@ struct AWClient {
             throw error
         }
     }
+    
+    static func getModels<T:Codable>(collection: AWCollection) async throws -> [T] {
+        do {
+            let documents = try await AWClient.shared.database.listDocuments(
+                databaseId: AWConfig.database.id,
+                collectionId: collection.id
+            )
+            let documentsData = try documents.documents.map { doc in
+                try convertToData(doc.data)
+            }
+            let decoder = JSONDecoder()
+            let models = try documentsData.map { data in
+                try decoder.decode(T.self, from: data)
+            }
+            return models
+        } catch {
+            logger.error("\(error.localizedDescription)")
+            throw error
+        }
+    }
+    
     
     static func getDocumentsWithQuery<T: Codable>(collection: AWCollection, queries: [String]) async throws -> [T] {
         do {

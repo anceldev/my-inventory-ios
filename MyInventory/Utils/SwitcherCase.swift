@@ -12,11 +12,11 @@ protocol SwitcherCase {
     var count: Int { get }
 }
 
-enum InventoriesLists: CaseIterable, SwitcherCase, Hashable {
+enum InventoryType: CaseIterable, SwitcherCase, Hashable {
     case mine
     case shared
     
-    static var counts: [InventoriesLists: Int] = [
+    static var counts: [InventoryType: Int] = [
         .mine: 0,
         .shared: 0
     ]
@@ -30,10 +30,10 @@ enum InventoriesLists: CaseIterable, SwitcherCase, Hashable {
     
     var count: Int {
         get {
-            return InventoriesLists.counts[self] ?? 0
+            return InventoryType.counts[self] ?? 0
         }
         set {
-            InventoriesLists.counts[self] = newValue
+            InventoryType.counts[self] = newValue
         }
     }
 }
@@ -61,6 +61,34 @@ enum FriendsLists: CaseIterable, SwitcherCase, Hashable {
         }
         set {
             FriendsLists.counts[self] = newValue
+        }
+    }
+}
+
+enum Improvement: CaseIterable, SwitcherCase, Hashable {
+    case approved
+    case implemented
+    case review
+    
+    static var counts: [Improvement: Int] = [
+        .approved: 0,
+        .implemented: 0,
+        .review: 0,
+    ]
+    var title: String {
+        switch self {
+        case .approved: "Aprobado"
+        case .implemented: "Implementado"
+        case .review: "En revisión"
+        }
+    }
+    var count: Int {
+        get {
+//            return Improvement.counts[self] ?? 0
+            return Improvement.counts[self]!
+        }
+        set {
+            Improvement.counts[self] = newValue
         }
     }
 }

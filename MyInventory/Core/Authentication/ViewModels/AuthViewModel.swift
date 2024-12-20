@@ -67,41 +67,39 @@ class AuthViewModel {
     }
     
     @MainActor
-        private func debounceUsernameCheck() async {
-            print("testing username")
-            debounceTask?.cancel()
-            
-            guard !username.isEmpty else {
-                isUsernameAvailable = nil
-                isChecking = false
-                return
-            }
-            
-            debounceTask = Task {
-                isChecking = true
-                
-                do {
-                    try await Task.sleep(nanoseconds: UInt64(debounceInterval * 1_000_000_000))
-                    
-                    if Task.isCancelled { return }
-                    
-//                    let isAvailable = await checkUsernameAvailability(username)
-                    let isAvailable = try await isUsernameAvailable()
-                    
-                    if Task.isCancelled { return }
-                    
-                    await MainActor.run {
-                        isUsernameAvailable = isAvailable
-                    }
-                } catch {
-                    print("Debounce task cancelled")
-                }
+    private func debounceUsernameCheck() async {
+        print("testing username")
+        debounceTask?.cancel()
+        
+        guard !username.isEmpty else {
+            self.errorMessage = nil
+            isUsernameAvailable = nil
+            isChecking = false
+            return
+        }
+        
+        debounceTask = Task {
+            isChecking = true
+
+            do {
+                try await Task.sleep(nanoseconds: UInt64(debounceInterval * 1_000_000_000))
+                if Task.isCancelled { return }
+                let isAvailable = try await isUsernameAvailable()
+                if Task.isCancelled { return }
                 
                 await MainActor.run {
-                    isChecking = false
+                    isUsernameAvailable = isAvailable
                 }
+            } catch {
+                print("Debounce task cancelled or error in username check")
+                self.errorMessage = error.localizedDescription
+            }
+            
+            await MainActor.run {
+                isChecking = false
             }
         }
+    }
     
     
     
@@ -204,7 +202,6 @@ class AuthViewModel {
                 return false
             }
             self.errorMessage = error.localizedDescription
-            print(self.errorMessage ?? "Error founded")
             return false
         }
     }

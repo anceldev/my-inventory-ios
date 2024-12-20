@@ -9,7 +9,7 @@ import SwiftUI
 
 struct InventoriesListView: View {
     
-    @State private var inventoriesList: InventoriesLists = .mine
+    @State private var inventoriesList: InventoryType = .mine
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
