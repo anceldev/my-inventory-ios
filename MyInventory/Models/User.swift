@@ -34,13 +34,14 @@ struct User: Identifiable, Codable {
     var avatar: AvatarImage
     var following: [String]
     var inventories: [Inventory]
+    var friends: [User]
     
     enum CodingKeys: String, CodingKey {
         case id = "$id"
         case name, username, email, following, avatar
     }
     
-    init(id: String = Appwrite.ID.unique(), name: String, username: String, email: String, avatar: AvatarImage = .avatarDefault, following: [String] = []) {
+    init(id: String = Appwrite.ID.unique(), name: String, username: String, email: String, avatar: AvatarImage = .avatarDefault, following: [String] = [], friends: [User] = []) {
         self.id = id
         self.name = name
         self.username = username
@@ -48,6 +49,7 @@ struct User: Identifiable, Codable {
         self.avatar = avatar
         self.following = following
         self.inventories = []
+        self.friends = []
     }
     
     init(from decoder: any Decoder) throws {
@@ -59,6 +61,7 @@ struct User: Identifiable, Codable {
         self.avatar = try container.decode(AvatarImage.self, forKey: .avatar)
         self.following = try container.decode([String].self, forKey: .following)
         self.inventories = []
+        self.friends = []
     }
     
     func encode(to encoder: any Encoder) throws {
@@ -73,6 +76,7 @@ struct User: Identifiable, Codable {
 
 extension User {
     static var preview = User(
+        id: "675cdc1a1abc2861d5c1",
         name: "Ancel Guarayo",
         username: "ancelote",
         email: "ancel@mail.com",

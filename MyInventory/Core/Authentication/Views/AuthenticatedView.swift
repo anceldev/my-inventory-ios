@@ -12,8 +12,8 @@ struct AuthenticatedView: View {
     var body: some View {
         VStack {
             switch authVM.state {
-            case .authenticated(_):
-                RootView()
+            case .authenticated(let userId):
+                RootView(for: userId)
             case .authenticating:
                 ProgressView()
             case .unauthenticated:

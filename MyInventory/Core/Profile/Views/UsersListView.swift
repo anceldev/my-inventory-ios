@@ -9,7 +9,8 @@ import SwiftUI
 
 struct UsersListView: View {
 
-    @Environment(AuthViewModel.self) var authVM
+//    @Environment(AuthViewModel.self) var authVM
+//    @Environment(AccountViewModel.self) var accountVM
     @State private var friendsList: FriendsLists = .myFriends
     
     var body: some View {
@@ -31,5 +32,6 @@ struct UsersListView: View {
 
 #Preview {
     UsersListView()
-        .environment(AuthViewModel())
+//        .environment(AccountViewModel(userId: "675cdc1a1abc2861d5c1"))
+//        .environment(AuthViewModel())
 }

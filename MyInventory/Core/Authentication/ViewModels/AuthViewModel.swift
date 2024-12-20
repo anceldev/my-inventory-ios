@@ -24,7 +24,8 @@ enum AuthError: Error {
 enum AuthState {
     case unauthenticated
     case authenticating
-    case authenticated(User)
+//    case authenticated(User)
+    case authenticated(String)
 }
 
 enum AuthFlow {
@@ -101,10 +102,6 @@ class AuthViewModel {
         }
     }
     
-    
-    
-    
-    
     func signIn() async throws {
         do {
             self.state = .authenticating
@@ -117,7 +114,7 @@ class AuthViewModel {
                 let account = try await AWClient.shared.account.get()
                 let user: User = try await AWClient.getModel(collection: .users, id: account.id)
                 self.user = user
-                self.state = .authenticated(user)
+                self.state = .authenticated(user.id)
                 self.authFlow = .signIn
                 return
             }
@@ -156,7 +153,7 @@ class AuthViewModel {
                     model: userModel
                 )
                 
-                self.state = .authenticated(userModel)
+                self.state = .authenticated(userModel.id)
                 self.authFlow = .signIn
                 return
             }
@@ -189,7 +186,7 @@ class AuthViewModel {
     func isUsernameAvailable() async throws -> Bool {
         do {
             let queries = [Query.equal("username", value: self.username.lowercased())]
-            let existingUser: [User] = try await AWClient.getDocumentsWithQuery(collection: .users, queries: queries)
+            let existingUser: [User] = try await AWClient.getModelsWithQuery(collection: .users, queries: queries)
             if existingUser.count > 0 {
                 throw AuthError.existingUsername
             }
@@ -212,7 +209,7 @@ class AuthViewModel {
             let account = try await AWClient.shared.account.get()
             let user: User = try await AWClient.getModel(collection: .users, id: account.id)
             self.user = user
-            self.state = .authenticated(user)
+            self.state = .authenticated(user.id)
         } catch {
             self.state = .unauthenticated
             if let appwriteError = error as? AppwriteError {

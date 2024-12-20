@@ -55,11 +55,6 @@ struct BoxesList: View {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(.white, lineWidth: 1.5)
         }
-        .padding(6)
+        .padding(4)
     }
 }
-//
-//#Preview(traits: .sizeThatFitsLayout, body: {
-//    BoxesList()
-//        .background(.red.opacity(0.5))
-//})

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct EditProfileView: View {
     @Environment(AuthViewModel.self) var authVM
+    @Environment(AccountViewModel.self) var accountVM
     @Environment(\.dismiss) var dismiss
     var user: User
     @State private var newName: String
@@ -152,28 +153,11 @@ struct EditProfileView: View {
     }
     private func updateProfile() {
         Task {
-            do {
-                print(selectedProfile?.rawValue ?? "NO selected")
-                print(newName)
-                print(newUsername)
-                let newUserData = User(
-                    id: user.id,
-                    name: newName,
-                    username: newUsername,
-                    email: user.email,
-                    avatar: selectedProfile ?? .avatarDefault
-                )
-                try await AWClient.updateDocument(
-                    collection: .users,
-                    model: newUserData,
-                    docId: newUserData.id
-                )
-                authVM.user?.name = newName
-                authVM.user?.username = newUsername
-                authVM.user?.avatar = selectedProfile ?? .avatarDefault
-            } catch {
-                logger.error("\(error.localizedDescription)")
-            }
+            await accountVM.updateProfile(
+                newName: newName.isEmpty ? nil : newName,
+                newUsername: newUsername.isEmpty ? nil : newUsername,
+                newAvatar: selectedProfile
+            )
         }
     }
 }
@@ -181,4 +165,5 @@ struct EditProfileView: View {
 #Preview {
     EditProfileView(for: User.preview)
         .environment(AuthViewModel())
+        .environment(AccountViewModel(userId: "675cdc1a1abc2861d5c1"))
 }

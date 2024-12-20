@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AddImprovementView: View {
+struct AddSuggestionView: View {
     
     enum FormFields {
         case title

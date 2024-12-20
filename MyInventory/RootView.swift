@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RootView: View {
     
-    
     enum Tabs: String, Identifiable {
         case profile
         case add
@@ -19,10 +18,11 @@ struct RootView: View {
             self.rawValue
         }
     }
-    
+    @State var accountVM: AccountViewModel
     @State private var selectedTab: Tabs = .inventories
     
-    init() {
+    init(for userId: String) {
+        self._accountVM = State(initialValue: AccountViewModel(userId: userId))
         UITabBar.appearance().backgroundColor = .clear
         UITabBar.appearance().unselectedItemTintColor = UIColor(.neutral300)
     }
@@ -45,12 +45,14 @@ struct RootView: View {
         .tint(.neutral600)
         .animation(.easeOut, value: selectedTab)
         .transition(.slide)
+        .environment(accountVM)
     }
 }
 
 #Preview {
     NavigationStack {
-        RootView()
+        RootView(for: "675cdc1a1abc2861d5c1")
+            .environment(AccountViewModel(userId: "675cdc1a1abc2861d5c1"))
             .environment(AuthViewModel())
     }
 }

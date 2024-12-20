@@ -12,21 +12,21 @@ struct Inventory: Codable, Identifiable, Hashable {
     var id: String
     var name: String
     var description: String
-    var ownerId: String
+    var owner: String
     var sharedWith: [String]
     var users: [User]
     var boxes: [Box]
     
     enum CodingKeys: String, CodingKey {
         case id = "$id"
-        case name, description, ownerId, sharedWith
+        case name, description, owner, sharedWith
     }
     
-    init(name: String, description: String, owenerId: String, sharedWith: [String] = [], users: [User] = [], boxes: [Box] = []) {
+    init(name: String, description: String, owener: String, sharedWith: [String] = [], users: [User] = [], boxes: [Box] = []) {
         self.id = Appwrite.ID.unique()
         self.name = name
         self.description = description
-        self.ownerId = owenerId
+        self.owner = owener
         self.sharedWith = sharedWith
         self.users = users
         self.boxes = boxes
@@ -37,7 +37,7 @@ struct Inventory: Codable, Identifiable, Hashable {
         self.id = try container.decode(String.self, forKey: .id)
         self.name = try container.decode(String.self, forKey: .name)
         self.description = try container.decode(String.self, forKey: .description)
-        self.ownerId = try container.decode(String.self, forKey: .ownerId)
+        self.owner = try container.decode(String.self, forKey: .owner)
         self.sharedWith = try container.decode([String].self, forKey: .sharedWith)
         self.users = []
         self.boxes = []
@@ -47,7 +47,7 @@ struct Inventory: Codable, Identifiable, Hashable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.name, forKey: .name)
         try container.encode(self.description, forKey: .description)
-        try container.encode(self.ownerId, forKey: .ownerId)
+        try container.encode(self.owner, forKey: .owner)
         try container.encode(self.sharedWith, forKey: .sharedWith)
     }
     
@@ -66,7 +66,7 @@ extension Inventory {
     static var preview = Inventory(
         name: "Material Juegos",
         description: "Materiales para realizar juegos",
-        owenerId: User.previewJuan.id,
+        owener: User.previewJuan.id,
         users: [User.previewPedro, User.previewMari]
 //        boxes: [Box.preview1, Box.preview2, Box.preview3]
     )

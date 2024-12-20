@@ -17,19 +17,9 @@ struct SuggestionList: View {
         VStack {
             ScrollView(.vertical) {
                 ForEach(suggestions) { suggestion in
-                    VStack {
-                        Text(suggestion.title)
-                        Text(suggestion.content)
-                    }
-                    .background(.gray)
+                    SuggestionRow(for: suggestion)
                 }
             }
         }
-        .background(.neutral100)
-        .padding(24)
     }
-}
-
-#Preview {
-    SuggestionList([])
 }

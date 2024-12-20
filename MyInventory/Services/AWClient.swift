@@ -118,7 +118,7 @@ struct AWClient {
     }
     
     
-    static func getDocumentsWithQuery<T: Codable>(collection: AWCollection, queries: [String]) async throws -> [T] {
+    static func getModelsWithQuery<T: Codable>(collection: AWCollection, queries: [String]) async throws -> [T] {
         do {
             let documents = try await AWClient.shared.database.listDocuments(
                 databaseId: AWConfig.database.id,
@@ -126,9 +126,7 @@ struct AWClient {
                 queries: queries
             )
             return try documents.documents.map { doc in
-//                let jsonData = try JSONSerialization.data(withJSONObject: doc.data)
                 let data = try convertToData(doc.data)
-                print(String(decoding: data, as: UTF8.self))
                 return try JSONDecoder().decode(T.self, from: data)
             }
         } catch {
@@ -159,6 +157,7 @@ struct AWClient {
     static func updateDocument<T: Codable & Identifiable>(collection: AWCollection, model: T, docId: String) async throws {
         do {
             let jsonData = try convertToJsonString(model)
+            print(jsonData)
             let _ = try await AWClient.shared.database.updateDocument(
                 databaseId: AWConfig.database.id,
                 collectionId: collection.id,
@@ -170,6 +169,22 @@ struct AWClient {
             throw error
         }
     }
+    
+    static func updateDocumentData(collection: AWCollection, data: String, docId: String) async throws {
+        do {
+            _ = try await AWClient.shared.database.updateDocument(
+                databaseId: AWConfig.database.id,
+                collectionId: collection.id,
+                documentId: docId,
+                data: data
+            )
+        } catch  {
+            logger.error("\(error.localizedDescription)")
+            throw error
+        }
+    }
+    
+//    static func updateDocument
     
     
     /// Uploads an Image to Appwrite and saves it on cache using `ImageCacheManager`

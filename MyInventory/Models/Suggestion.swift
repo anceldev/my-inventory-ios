@@ -7,6 +7,7 @@
 
 import Appwrite
 import Foundation
+import SwiftUI
 
 struct Suggestion: Identifiable, Codable {
     var id: String
@@ -47,6 +48,35 @@ struct Suggestion: Identifiable, Codable {
 
 extension Suggestion {
     enum Status: String, Codable {
-        case approved, implemented, review
+        case implemented
+        case approved
+        case review
+        
+        var name: String {
+            switch self {
+            case .approved:     return "Aprobado"
+            case .implemented:  return "Implementado"
+            case .review:   return "En revisión"
+            }
+        }
+        
+        var foreground: Color {
+            switch self {
+            case .approved:     return Color.blueDarker
+            case .implemented:  return Color.greenDarker
+            case .review:       return Color.yellowDarker
+            }
+        }
+        var background: Color {
+            switch self {
+            case .approved:     return .blueLight
+            case .implemented:  return .greenLight
+            case .review:       return .yellowLight
+            }
+        }
     }
+    
+    static var previewApproved: Suggestion = .init(userId: "", title: "First", content: "Content of the first suggestion", status: .approved)
+    static var previewReview: Suggestion = .init(userId: "", title: "Second one", content: "This is the second suggestion added.This is the second suggestion added. This is the second suggestion added. This is the second suggestion added. This is the second suggestion added. This is the second suggestion added. This is the second suggestion added. This is the second suggestion added", status: .review)
+    static var previewImplemented: Suggestion = .init(userId: "", title: "third", content: "Another suggestion made", status: .implemented)
 }

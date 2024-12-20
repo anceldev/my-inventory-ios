@@ -8,21 +8,17 @@
 import SwiftUI
 
 struct ProfileView: View {
+
     @Environment(AuthViewModel.self) var authVM
+    @Environment(AccountViewModel.self) var accountVM
     @Environment(\.dismiss) var dismiss
     @State private var suggestionsVM = SuggestionsViewModel()
-    
-    var profileImage: Image {
-        if let avatar = authVM.user?.avatar {
-            return Image(avatar.rawValue)
-        }
-        return Image(AvatarImage.avatarDefault.rawValue)
-    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
                 VStack {
-                    profileImage
+                    Image(accountVM.account.avatar.rawValue)
                         .resizable()
                         .aspectRatio(1/1, contentMode: .fill)
                         .frame(width: 120, height: 120)
@@ -31,10 +27,10 @@ struct ProfileView: View {
                                 .stroke(.white, lineWidth: 5)
                         }
                     VStack(spacing: 4) {
-                        Text(authVM.user?.name.capitalized ?? "No-name")
+                        Text(accountVM.account.name.capitalized)
                             .font(.system(size: 28, weight: .medium))
                             .foregroundStyle(.neutral600)
-                        Text("@\(authVM.user?.username ?? "NO-USERNAME")")
+                        Text("@\(accountVM.account.username.lowercased())")
                             .foregroundStyle(.neutral500)
                             .fontWeight(.light)
                             .font(.system(size: 14))
@@ -42,7 +38,6 @@ struct ProfileView: View {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 16  ))
                 .padding(.horizontal, 20)
-//                .padding(.bottom, 16)
                 .frame(maxWidth: .infinity)
                 Divider()
                 
@@ -52,12 +47,16 @@ struct ProfileView: View {
                             Text("ShareQR")
                         } label: {
                             ProfileRow("Compartir QR", description: "Comparte tu perfil con otros") {
-                                ShareQRRowImage()
+                                ItemRowImage(
+                                    systemName: "qrcode",
+                                    color: Color.pinkDark,
+                                    size: .init(width: 40, height: 40)
+                                )
                             }
                         }
                         
                         NavigationLink {
-                            EditProfileView(for: authVM.user ?? User.preview)
+                            EditProfileView(for: accountVM.account)
                         } label: {
                             ProfileRow("Editar perfil", description: "Editar ajustes de perfil") {
                                 EditProfileRowImage()
@@ -190,23 +189,7 @@ struct ProfileView: View {
             .rotationEffect(.degrees(-15))
     }
     @ViewBuilder
-    func ShareQRRowImage() -> some View {
-        Image(systemName: "qrcode")
-            .resizable()
-            .frame(width: 40, height: 40, alignment: .center)
-            .rotationEffect(.degrees(15))
-    }
-    @ViewBuilder
-    func SignOutRowImage() -> some View {
-        Image(systemName: "door.left.hand.open")
-            .resizable()
-            .frame(width: 25, height: 40, alignment: .center)
-            .rotationEffect(.degrees(15))
-            .foregroundStyle(.redDark)
-    }
-    @ViewBuilder
     func ItemRowImage(systemName: String, color: Color, size: CGSize) -> some View {
-     
             Image(systemName: systemName)
                 .resizable()
                 .frame(width: size.width, height: size.height)
@@ -216,10 +199,9 @@ struct ProfileView: View {
 }
 
 #Preview {
-    let authVM = AuthViewModel()
-    authVM.user = User.preview
-    return NavigationStack {
+    NavigationStack {
         ProfileView()
-            .environment(authVM)
+            .environment(AuthViewModel())
+            .environment(AccountViewModel(userId: "675cdc1a1abc2861d5c1"))
     }
 }

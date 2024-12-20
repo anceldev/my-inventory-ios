@@ -66,13 +66,13 @@ enum FriendsLists: CaseIterable, SwitcherCase, Hashable {
 }
 
 enum Improvement: CaseIterable, SwitcherCase, Hashable {
-    case approved
     case implemented
+    case approved
     case review
     
     static var counts: [Improvement: Int] = [
-        .approved: 0,
         .implemented: 0,
+        .approved: 0,
         .review: 0,
     ]
     var title: String {
