@@ -5,6 +5,7 @@
 //  Created by Ancel Dev account on 13/12/24.
 //
 
+import Appwrite
 import SwiftUI
 
 struct CreateInventoryView: View {
@@ -17,12 +18,18 @@ struct CreateInventoryView: View {
     
     @Environment(\.dismiss) private var dismiss
     @Environment(AccountViewModel.self) var accountVM
+    @Environment(InventoryViewModel.self) var inventoryVM
+    
+    @State private var newInventoryId = Appwrite.ID.unique()
     
     @State private var showNewBoxForm = false
     @State private var name = ""
     @State private var description = ""
     @State private var ownerId = ""
     @State private var sharedWith: [String] = []
+    @State private var sharedUsers: [User] = []
+    @State private var boxes: [Box] = []
+    @State private var items: [Item] = []
     @State private var isShared = false
     
     var body: some View {
@@ -69,9 +76,10 @@ struct CreateInventoryView: View {
                                 .underline()
                         }
                     }
-                    if true {
-                        BoxesList()
+                    if boxes.count > 0 {
+                        BoxesList(items: $items, boxes: boxes)
                     }
+
                     HStack(alignment: .bottom) {
                         Text("Tipo:")
                             .font(.system(size: 14))
@@ -92,7 +100,7 @@ struct CreateInventoryView: View {
                             VStack {
                                 ScrollView(.vertical) {
                                     ForEach(accountVM.account.friends) { user in
-                                        SmallUserRow(user: user, sharedWith: $sharedWith)
+                                        SmallUserRow(user: user, sharedWith: $sharedWith, sharedUsers: $sharedUsers)
                                     }
                                 }
                                 .scrollIndicators(.hidden)
@@ -103,6 +111,18 @@ struct CreateInventoryView: View {
                                 .frame(maxWidth: .infinity)
                         }
                     }
+                    Button {
+                        createInventory()
+                    } label: {
+                        Text("Añadir")
+                            .foregroundStyle(.white)
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 12)
+                    .background(.blueBase)
+                    .clipShape(.capsule)
                 }
                 Spacer()
             }
@@ -111,7 +131,7 @@ struct CreateInventoryView: View {
         .padding([.horizontal, .bottom],24)
         .background(.neutral200)
         .sheet(isPresented: $showNewBoxForm) {
-            AddBoxView()
+            AddBoxView(to: $boxes, for: newInventoryId, userId: inventoryVM.user.id)
                 .presentationDetents([.height(206)])
                 .presentationBackground(Color.neutral200)
                 .presentationDragIndicator(.visible)
@@ -127,14 +147,35 @@ struct CreateInventoryView: View {
             }
         }
         .onChange(of: isShared) { oldValue, newValue in
-            if newValue {
+            if newValue == true {
                 getFriends()
+            } else {
+                sharedWith = []
+                sharedUsers = []
             }
+        }
+        .onAppear {
+            print(newInventoryId)
         }
     }
     private func getFriends() {
         Task {
             await accountVM.getFriends()
+        }
+    }
+    private func createInventory() {
+        let newInventory = Inventory(
+            id: newInventoryId,
+            name: name,
+            description: description,
+            owener: inventoryVM.user.id,
+            sharedWith: isShared ? sharedWith : [],
+            users: isShared ? sharedUsers : [],
+            boxes: boxes
+        )
+        Task {
+            await inventoryVM.createInventory(inventory: newInventory, boxes: boxes, items: items)
+            dismiss()
         }
     }
 }
@@ -143,5 +184,6 @@ struct CreateInventoryView: View {
     NavigationStack {
         CreateInventoryView()
             .environment(AccountViewModel(userId: User.preview.id))
+            .environment(InventoryViewModel(user: User.preview))
     }
 }

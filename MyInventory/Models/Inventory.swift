@@ -22,8 +22,8 @@ struct Inventory: Codable, Identifiable, Hashable {
         case name, description, owner, sharedWith
     }
     
-    init(name: String, description: String, owener: String, sharedWith: [String] = [], users: [User] = [], boxes: [Box] = []) {
-        self.id = Appwrite.ID.unique()
+    init(id: String = Appwrite.ID.unique(), name: String, description: String, owener: String, sharedWith: [String] = [], users: [User] = [], boxes: [Box] = []) {
+        self.id = id
         self.name = name
         self.description = description
         self.owner = owener

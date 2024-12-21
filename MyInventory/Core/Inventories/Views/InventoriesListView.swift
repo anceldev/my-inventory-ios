@@ -10,13 +10,14 @@ import SwiftUI
 struct InventoriesListView: View {
     
     @State private var inventoriesList: InventoryType = .mine
+    @State private var inventoryVM: InventoryViewModel
+    
+    init(for account: User) {
+        self._inventoryVM = State(initialValue: InventoryViewModel(user: account))
+    }
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
-//                Text("Inventarios")
-//                    .font(.system(size: 60, weight: .bold))
-//                    .padding(.bottom, 16)
-//                    .foregroundStyle(.neutral700)
                 Title("Inventarios", fontSize: 60)
                 GenericSwitcher(selection: $inventoriesList)
                 ScrollView(.vertical) {
@@ -42,12 +43,14 @@ struct InventoriesListView: View {
                     }
                 }
             }
+            
         }
+        .environment(inventoryVM)
     }
 }
 
 #Preview {
     NavigationStack {
-        InventoriesListView()
+        InventoriesListView(for: User.preview)
     }
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AddItemView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(AccountViewModel.self) var accountVM
     
     enum FormField {
         case name
@@ -17,17 +18,25 @@ struct AddItemView: View {
         case amount
     }
     
+    @Binding var items: [Item]
+    let boxId: String
+    
     @State private var name = ""
     @State private var description = ""
     @State private var status: ItemStatus = .new
     @State private var amount: Int = 0
-    @State private var boxId = ""
     @State private var addedBy = ""
     
     @FocusState private var focused: FormField?
     
+    init(items: Binding<[Item]> ,to boxId: String) {
+        self._items = items
+        self.boxId = boxId
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
+            
             Text("Nuevo Item")
                 .font(.system(size: 38, weight: .bold))
                 .foregroundStyle(.neutral700)
@@ -52,11 +61,24 @@ struct AddItemView: View {
                 TextField("Cantidad", value: $amount, format: .number)
                     .keyboardType(.numberPad)
                     .customTextField("Cantidad")
-                    .submitLabel(.go)
+                    .submitLabel(.done)
                     .onSubmit {
-                        addItem()
+                        focused = nil
                     }
             }
+            Button {
+                addItem()
+            } label: {
+                Text("Añadir")
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .padding(.horizontal, 12)
+            .background(.purpleBase)
+            .clipShape(.capsule)
+
             Spacer()
         }
         .padding(24)
@@ -64,10 +86,15 @@ struct AddItemView: View {
         .background(.neutral200)
     }
     private func addItem() {
-        print("Adding item...")
+        let newItem = Item(
+            name: name,
+            description: description,
+            status: status,
+            amount: amount,
+            boxId: boxId,
+            addedBy: accountVM.account.id
+        )
+        self.items.append(newItem)
+        dismiss()
     }
-}
-
-#Preview {
-    AddItemView()
 }

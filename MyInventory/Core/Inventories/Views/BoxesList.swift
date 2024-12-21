@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct BoxesList: View {
-    let boxes: [Box] = Box.boxesPreview
+    @Binding var items: [Item]
+    let boxes: [Box]
     
     let columns = [
         GridItem(.adaptive(minimum: 150))
@@ -17,13 +18,17 @@ struct BoxesList: View {
     var body: some View {
         LazyVGrid(columns: columns, spacing: 8) {
             ForEach(boxes) { box in
-                BoxView(box)
+                NavigationLink {
+                    BoxView(box, items: $items)
+                } label: {
+                    BoxCard(box)
+                }
             }
         }
     }
     
     @ViewBuilder
-    func BoxView(_ box: Box) -> some View {
+    func BoxCard(_ box: Box) -> some View {
         VStack(alignment: .leading, spacing: 17) {
             HStack {
                 Text(box.name)

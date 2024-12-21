@@ -23,13 +23,14 @@ struct RootView: View {
     
     init(for userId: String) {
         self._accountVM = State(initialValue: AccountViewModel(userId: userId))
+        
         UITabBar.appearance().backgroundColor = .clear
         UITabBar.appearance().unselectedItemTintColor = UIColor(.neutral300)
     }
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            InventoriesListView()
+            InventoriesListView(for: accountVM.account)
                 .tabItem {
                     Label("Invetarios", systemImage: selectedTab == .inventories ? "shippingbox.fill" : "shippingbox")
                         .labelStyle(.iconOnly)

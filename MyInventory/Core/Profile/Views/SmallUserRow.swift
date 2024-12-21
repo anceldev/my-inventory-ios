@@ -11,6 +11,7 @@ struct SmallUserRow: View {
     @Environment(AccountViewModel.self) var accountVM
     let user: User
     @Binding var sharedWith: [String]
+    @Binding var sharedUsers: [User]
 //    let action: () -> Void
     var isAdded: Bool {
         if sharedWith.contains(where: { $0 == user.id }) {
@@ -62,15 +63,17 @@ struct SmallUserRow: View {
     private func toggleFromInventory() {
         if sharedWith.contains(where: { $0 == user.id }) {
             sharedWith.removeAll { $0 == user.id }
+            sharedUsers.removeAll { $0.id == user.id }
             return
         }
         sharedWith.append(user.id)
+        sharedUsers.append(user)
     }
 }
 
 #Preview {
     VStack {
-        SmallUserRow(user: User.preview, sharedWith: .constant([]))
+        SmallUserRow(user: User.preview, sharedWith: .constant([]), sharedUsers: .constant([]))
             .environment(AccountViewModel(userId: User.preview.id))
     }
     .padding(24)

@@ -8,7 +8,7 @@
 import Appwrite
 import Foundation
 
-struct Box: Codable, Identifiable {
+struct Box: Codable, Identifiable, Hashable {
     var id: String
     var name: String
     var inventoryId: String

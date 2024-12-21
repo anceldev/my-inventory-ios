@@ -124,12 +124,12 @@ struct InventoryView: View {
                 }
                 .font(.system(size: 22))
                 .frame(maxWidth: .infinity, alignment: .leading)
-                ScrollView(.vertical) {
-                    switch list {
-                    case .boxes: BoxesList()
-                    case .items: ItemsList()
-                    }                    
-                }
+//                ScrollView(.vertical) {
+//                    switch list {
+//                    case .boxes: BoxesList()
+//                    case .items: ItemsList()
+//                    }                    
+//                }
                 .scrollIndicators(.hidden)
             }
             Spacer(minLength: 0)

@@ -9,7 +9,18 @@ import SwiftUI
 
 struct AddBoxView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var name = ""
+    
+    @State private var name: String
+    @Binding var boxes: [Box]
+    let inventoryId: String
+    let userId: String
+    
+    init(to boxes: Binding<[Box]>, for inventoryId: String, userId: String) {
+        self._name = State(initialValue: "")
+        self._boxes = boxes
+        self.inventoryId = inventoryId
+        self.userId = userId
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -42,7 +53,8 @@ struct AddBoxView: View {
         .background(.neutral200)
     }
     private func createBox() {
-        print("Add box")
+        let newBox = Box(name: name, inventoryId: inventoryId, createdBy: userId)
+        self.boxes.append(newBox)
         dismiss()
     }
 }

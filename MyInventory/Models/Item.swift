@@ -68,11 +68,19 @@ enum ItemStatus: String, Codable, Identifiable, CaseIterable {
 }
 
 extension Item {
-    static var item = Item(
+    static var preview1 = Item(
         name: "Pelotas de tenis",
         description: "Pelotas de tenis verdes",
         status: .new,
         amount: 3,
+        boxId: Box.preview1.id,
+        addedBy: User.previewJuan.id
+    )
+    static var preview2 = Item(
+        name: "Minisacos de arroz",
+        description: "Sacos de tella rellenos de arroz",
+        status: .new,
+        amount: 8,
         boxId: Box.preview1.id,
         addedBy: User.previewJuan.id
     )
