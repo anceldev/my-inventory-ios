@@ -204,7 +204,7 @@ struct AWClient {
                 return
             }
             let fileId = ID.unique()
-            let file = try await AWClient.shared.storage.createFile(
+            let _ = try await AWClient.shared.storage.createFile(
                 bucketId: bucket.id,
                 fileId: fileId,
                 file: InputFile.fromData(

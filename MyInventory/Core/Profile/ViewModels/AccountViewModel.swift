@@ -66,24 +66,36 @@ final class AccountViewModel {
     }
 
     
-    func addNewFriend(friendId: String) async -> Bool {
+//    func addNewFriend(friendId: String) async -> Bool {
+    func toggleFromFriends(friendId: String, isFriend: Bool = false)  async {
         do {
             var friendsArray = account.following
-            friendsArray.append(friendId)
+            
+            if isFriend {
+                friendsArray.removeAll { $0 == friendId }
+            } else {
+                friendsArray.append(friendId)
+            }
+            
             let jsonData: [String: Any] = [ "following": friendsArray ]
             guard let data = try? JSONSerialization.data(withJSONObject: jsonData),
                   let jsonString = String(data: data, encoding: .utf8) else {
                 throw NSError(domain: "JSON create error", code: -1)
             }
             try await AWClient.updateDocumentData(collection: .users, data: jsonString, docId: account.id)
-            self.account.following.append(friendId)
-            return true
+            
+            if isFriend {
+                self.account.following.removeAll { $0 == friendId }
+            } else {
+                self.account.following.append(friendId)
+            }
+            
         } catch {
             logger.error("\(error.localizedDescription)")
             self.errorMessage = error.localizedDescription
-            return false
         }
     }
+    
     
     func updateProfile(newName: String?, newUsername: String?, newAvatar: AvatarImage?) async {
         do {

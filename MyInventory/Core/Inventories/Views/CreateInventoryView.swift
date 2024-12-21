@@ -16,6 +16,7 @@ struct CreateInventoryView: View {
     @FocusState private var focused: FormFields?
     
     @Environment(\.dismiss) private var dismiss
+    @Environment(AccountViewModel.self) var accountVM
     
     @State private var showNewBoxForm = false
     @State private var name = ""
@@ -87,15 +88,20 @@ struct CreateInventoryView: View {
                         CustomToggle(isOn: $isShared)
                     }
                     if isShared {
-                        VStack {
-                            ScrollView(.vertical) {
-                                ForEach(1..<10) { item in
-                                    Text("User \(item)")
+                        if accountVM.account.friends.count > 0 {
+                            VStack {
+                                ScrollView(.vertical) {
+                                    ForEach(accountVM.account.friends) { user in
+                                        SmallUserRow(user: user, sharedWith: $sharedWith)
+                                    }
                                 }
+                                .scrollIndicators(.hidden)
                             }
-                            .scrollIndicators(.hidden)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        } else {
+                            Text("Todavía no has añadido a nadíe como amigo, añade el primero y podrás compartir tu inventario con él.")
+                                .frame(maxWidth: .infinity)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
                 Spacer()
@@ -120,11 +126,22 @@ struct CreateInventoryView: View {
                 }
             }
         }
+        .onChange(of: isShared) { oldValue, newValue in
+            if newValue {
+                getFriends()
+            }
+        }
+    }
+    private func getFriends() {
+        Task {
+            await accountVM.getFriends()
+        }
     }
 }
 
 #Preview {
     NavigationStack {
         CreateInventoryView()
+            .environment(AccountViewModel(userId: User.preview.id))
     }
 }

@@ -18,20 +18,7 @@ struct FriendsListView: View {
                 if vm.account.friends.count > 0{
                     ForEach(vm.account.friends) { user in
                         if user.id != accountVM.account.id {
-                            HStack {
-                                VStack {
-                                    Text("@\(user.username)")
-                                }
-                                Spacer(minLength: 0)
-//                                VStack {
-//                                    Button {
-//                                        addFriend(id: user.id)
-//                                    } label: {
-//                                        Text("Add")
-//                                    }
-//                                }
-                            }
-                            .padding(15)
+                            UserRow(user: user)
                         }
                     }
                 }
@@ -52,5 +39,5 @@ struct FriendsListView: View {
 
 #Preview {
     FriendsListView()
-        .environment(AuthViewModel())
+        .environment(AccountViewModel(userId: User.preview.id))
 }

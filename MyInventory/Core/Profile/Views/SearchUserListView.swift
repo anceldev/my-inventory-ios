@@ -27,20 +27,7 @@ struct SearchUserListView: View {
                 if accountVM.searchedUsers.count > 0{
                     ForEach(accountVM.searchedUsers) { user in
                         if user.id != accountVM.account.id {
-                            HStack {
-                                VStack {
-                                    Text("@\(user.username)")
-                                }
-                                Spacer(minLength: 0)
-                                VStack {
-                                    Button {
-                                        addFriend(id: user.id)
-                                    } label: {
-                                        Text("Add")
-                                    }
-                                }
-                            }
-                            .padding(15)
+                            UserRow(user: user)
                         }
                     }
                 }
@@ -49,11 +36,6 @@ struct SearchUserListView: View {
         .animation(.easeIn, value: accountVM.searchedUsers.count)
         .onAppear {
             searchUsers()
-        }
-    }
-    private func addFriend(id: String) {
-        Task {
-            await accountVM.addNewFriend(friendId: id)
         }
     }
     private func searchUsers() {
